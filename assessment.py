@@ -3,6 +3,7 @@
 **IMPORTANT:** These problems are meant to be solved using
 dictionaries and sets.
 """
+from collections import defaultdict
 
 
 def count_words(phrase):
@@ -95,20 +96,12 @@ def word_length_sorted(words):
     """
 
     # Initialize empty dictionary
-    length_to_word = {}
+    length_to_word = defaultdict(list)
+    words.sort()
 
-    # For loop to create (key, value) as (length of word: [list of
-    # words with the same length])
-
+    # For loop to create (key, value)
     for word in words:
-        if len(word) in length_to_word:
-            length_to_word[len(word)].append(word)
-        else:
-            length_to_word[len(word)] = [word, ]
-
-    # Sort list within each value alphabetically
-    for key in length_to_word:
-        length_to_word[key].sort()
+        length_to_word[len(word)].append(word)
 
     # Return list sorted by key in acsending order
     return sorted(length_to_word.items())
@@ -172,11 +165,8 @@ def translate_to_pirate_talk(phrase):
 
     words = phrase.split()
 
-    # List comprehension to translate English words found as keys
-    pirate_talk = [english_to_pirate.get(word, word) for word in words]
-
-    # Return stringified list of pirate talk
-    return " ".join(pirate_talk)
+    # Return stringified list comprehension to translate English words found as keys
+    return " ".join([english_to_pirate.get(word, word) for word in words])
 
 
 def kids_game(names):
@@ -224,54 +214,33 @@ def kids_game(names):
     a dictionary (with the super-fast lookup they provide) can help;
     good solutions here will definitely require a dictionary.
     """
-    # Initialize empty dictionary and output list
-    avail_names = {}
+    # Initialize empty defaultdict and output list
+    avail_names = defaultdict(list)
     output_list = []
 
-    # Define current word and current ending letter
-    current_word = names[0]
-    current_ending = current_word[-1]
-
-    # Append used word to output list
-    output_list.append(current_word)
+    # Define current word
+    word = names[0]
 
     # Create dictionary for available names for use
     # Key, Value => first_letter : [list of words starting with the first_letter]
 
-    # Exclude first item, since it was used at beginning of game
     for name in names[1:]:
-        first_letter = name[0]
-
-        # Check for existence in dictionary; if key exists, append to list
-        # If not, assign word to new first_letter key
-        if first_letter in avail_names:
-            avail_names[first_letter].append(name)
-        else:
-            avail_names[first_letter] = [name, ]
+        avail_names[name[0]].append(name)
 
     # Find next word whose first letter matches current ending letter
-
-    # If there's no match to the first item, return output list
-    try:
-        avail_names[current_ending]
-    except KeyError:
-        return output_list
 
     # While the list values have not been exhausted of word options,
     # reassign current word and current ending letter to the next
     # found match within dictionary
 
-    while avail_names.get(current_ending) != []:
-
-        if current_ending in avail_names:
-            current_word = avail_names[current_ending][0]
-            avail_names[current_ending].remove(current_word)
-            current_ending = current_word[-1]
-            output_list.append(current_word)
-
-    # Return output list once there are no more matches
-    return output_list
-
+    while True:
+        if avail_names.get(word[-1]) in (None, []):
+            output_list.append(word)
+            return output_list
+        else:
+            output_list.append(word)
+            word = avail_names[word[-1]][0]
+            avail_names[word[0]].remove(word)
 
 #####################################################################
 # You can ignore everything below this.
